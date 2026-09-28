@@ -8,7 +8,6 @@ RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "https://minecraft-auth-b
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-# Хранилище: { код: chat_id }
 pending_codes = {}   
 player_chats = {}    
 
@@ -46,31 +45,29 @@ def process_nickname(message):
         parse_mode="Markdown"
     )
 
-# Эндпоинт, к которому стучится плагин Minecraft при вводе /tg <код>
+# Поддержка разных вариантов путей, чтобы плагин точно достучался
 @app.route('/verify', methods=['POST'])
+@app.route('/verify-code', methods=['POST'])
 def verify_code():
     data = request.get_json()
     if not data:
         return jsonify({"status": "error"}), 400
         
-    code = data.get('code')
-    player_name = data.get('player')
+    code = str(data.get('code')).strip()
+    player_name = str(data.get('player')).strip().lower()
     
     if code in pending_codes:
         chat_id = pending_codes[code]
-        # Отправляем радостное сообщение в Telegram игроку
         bot.send_message(
             chat_id, 
             f"✅ Аккаунт успешно привязан к игроку *{player_name}*!", 
             parse_mode="Markdown"
         )
-        # Очищаем использованный код
         del pending_codes[code]
         return jsonify({"status": "success"}), 200
         
     return jsonify({"status": "error", "message": "Invalid code"}), 400
 
-# Получение обновлений от Telegram через вебхук
 @app.route(f'/{TOKEN}', methods=['POST'])
 def webhook():
     json_string = request.get_data().decode('utf-8')
