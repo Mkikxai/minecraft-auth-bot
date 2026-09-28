@@ -3,7 +3,8 @@ import telebot
 from telebot import types
 from flask import Flask, request
 
-TOKEN = os.getenv("8663656567:AAF4HGgh9rusfHxWk0-smUBx3gnaGjng3SI")
+# Исправлено: теперь код ищет переменную окружения с именем "BOT_TOKEN"
+TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
@@ -38,7 +39,6 @@ def callback_query(call):
     elif call.data.startswith("kick_"):
         player_name = call.data.split("_")[1]
         bot.edit_message_text(f"🚨 Сессия игрока *{player_name}* сброшена! (Запрос отправлен на сервер)", call.message.chat.id, call.message.message_id, parse_mode="Markdown")
-        # Здесь бот может отправить сигнал на сервер для кика
 
 def process_nickname(message):
     import random
@@ -80,7 +80,6 @@ def alert_user():
     return "User not found", 404
 
 if __name__ == "__main__":
-    # Запуск бота и веб-сервера одновременно для Render
     import threading
     threading.Thread(target=lambda: app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))).start()
     bot.infinity_polling()
