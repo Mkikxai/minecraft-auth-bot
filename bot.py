@@ -38,6 +38,9 @@ def process_nickname(message):
     code = str(random.randint(100000, 999999))
     pending_codes[code] = chat_id
     player_chats[player_name] = chat_id
+    
+    print(f"[DEBUG] Сгенерирован код {code} для игрока {player_name} (chat_id: {chat_id})")
+    print(f"[DEBUG] Активные коды сейчас: {list(pending_codes.keys())}")
 
     bot.send_message(
         chat_id, 
@@ -45,17 +48,21 @@ def process_nickname(message):
         parse_mode="Markdown"
     )
 
-# Поддержка разных вариантов путей, чтобы плагин точно достучался
 @app.route('/verify', methods=['POST'])
 @app.route('/verify-code', methods=['POST'])
 def verify_code():
     data = request.get_json()
+    print(f"[DEBUG] Получен запрос /verify с данными: {data}")
+    
     if not data:
-        return jsonify({"status": "error"}), 400
+        return jsonify({"status": "error", "message": "No JSON data"}), 400
         
     code = str(data.get('code')).strip()
     player_name = str(data.get('player')).strip().lower()
     
+    print(f"[DEBUG] Игрок {player_name} пытается ввести код: {code}")
+    print(f[DEBUG] "Активные коды в памяти: {pending_codes}")
+
     if code in pending_codes:
         chat_id = pending_codes[code]
         bot.send_message(
