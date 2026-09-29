@@ -61,7 +61,7 @@ def verify_code():
     player_name = str(data.get('player')).strip().lower()
     
     print(f"[DEBUG] Игрок {player_name} пытается ввести код: {code}")
-    print(f[DEBUG] "Активные коды в памяти: {pending_codes}")
+    print(f"[DEBUG] Активные коды в памяти: {pending_codes}")
 
     if code in pending_codes:
         chat_id = pending_codes[code]
